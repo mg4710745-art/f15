@@ -1,26 +1,18 @@
-// ===============================
+// =========================================
 // CUENTA REGRESIVA
-// ===============================
+// =========================================
 
-const fechaEvento = new Date("December 30, 2026 19:00:00").getTime();
+const fechaEvento = new Date("2026-12-30T19:00:00").getTime();
 
-const contador = setInterval(() => {
+function actualizarCuenta() {
 
     const ahora = new Date().getTime();
-
     const diferencia = fechaEvento - ahora;
 
     if (diferencia <= 0) {
-
-        clearInterval(contador);
-
-        document.getElementById("dias").innerHTML = "0";
-        document.getElementById("horas").innerHTML = "0";
-        document.getElementById("minutos").innerHTML = "0";
-        document.getElementById("segundos").innerHTML = "0";
-
+        document.getElementById("countdown").innerHTML =
+        "<h2>¡Hoy es el gran día! 🎉</h2>";
         return;
-
     }
 
     const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
@@ -28,205 +20,212 @@ const contador = setInterval(() => {
     const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
     const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
 
-    document.getElementById("dias").innerHTML = dias;
-    document.getElementById("horas").innerHTML = horas;
-    document.getElementById("minutos").innerHTML = minutos;
-    document.getElementById("segundos").innerHTML = segundos;
+    document.getElementById("dias").textContent = dias;
+    document.getElementById("horas").textContent = horas;
+    document.getElementById("minutos").textContent = minutos;
+    document.getElementById("segundos").textContent = segundos;
 
-}, 1000);
+}
 
-// ===============================
-// EFECTO AL HACER SCROLL
-// ===============================
+setInterval(actualizarCuenta,1000);
+actualizarCuenta();
 
-const secciones = document.querySelectorAll("section");
 
-function mostrarSecciones() {
+// =========================================
+// ANIMACIÓN AL HACER SCROLL
+// =========================================
 
-    const altoPantalla = window.innerHeight;
+const elementos = document.querySelectorAll("section");
 
-    secciones.forEach(seccion => {
+const observer = new IntersectionObserver((entries)=>{
 
-        const posicion = seccion.getBoundingClientRect().top;
+    entries.forEach(entry=>{
 
-        if (posicion < altoPantalla - 120) {
+        if(entry.isIntersecting){
 
-            seccion.style.opacity = "1";
-            seccion.style.transform = "translateY(0px)";
+            entry.target.style.opacity="1";
+            entry.target.style.transform="translateY(0)";
 
         }
 
     });
 
-}
+},{threshold:0.2});
 
-secciones.forEach(seccion => {
+elementos.forEach(sec=>{
 
-    seccion.style.opacity = "0";
-    seccion.style.transform = "translateY(60px)";
-    seccion.style.transition = "all 1s ease";
+    sec.style.opacity="0";
+    sec.style.transform="translateY(80px)";
+    sec.style.transition="1s";
 
-});
-
-window.addEventListener("scroll", mostrarSecciones);
-
-mostrarSecciones();
-
-// ===============================
-// BOTÓN "VER INVITACIÓN"
-// ===============================
-
-const boton = document.querySelector(".boton");
-
-if (boton) {
-
-    boton.addEventListener("click", function(e){
-
-        e.preventDefault();
-
-        document.querySelector("#historia").scrollIntoView({
-
-            behavior:"smooth"
-
-        });
-
-    });
-
-}
-
-// ===============================
-// EFECTO EN LAS TARJETAS
-// ===============================
-
-const tarjetas = document.querySelectorAll(".card");
-
-tarjetas.forEach(card => {
-
-    card.addEventListener("mouseenter", () => {
-
-        card.style.boxShadow = "0 20px 40px rgba(214,51,132,.3)";
-        card.style.transform = "translateY(-10px)";
-
-    });
-
-    card.addEventListener("mouseleave", () => {
-
-        card.style.boxShadow = "0 10px 25px rgba(0,0,0,.1)";
-        card.style.transform = "translateY(0px)";
-
-    });
+    observer.observe(sec);
 
 });
 
-// ===============================
-// MENSAJE AL ENVIAR EL FORMULARIO
-// ===============================
 
-const formulario = document.querySelector("form");
+// =========================================
+// FLORES CAYENDO
+// =========================================
 
-if(formulario){
+const petalos = document.getElementById("petalos");
 
-formulario.addEventListener("submit", function(e){
+function crearPetalo(){
 
-e.preventDefault();
+    const petalo = document.createElement("div");
 
-alert("💖 ¡Gracias por confirmar tu asistencia!");
+    petalo.classList.add("petalo");
 
-formulario.reset();
+    petalo.innerHTML="🌸";
 
-});
+    petalo.style.left=Math.random()*100+"vw";
+
+    petalo.style.animationDuration=(6+Math.random()*5)+"s";
+
+    petalo.style.fontSize=(18+Math.random()*20)+"px";
+
+    petalos.appendChild(petalo);
+
+    setTimeout(()=>{
+
+        petalo.remove();
+
+    },11000);
 
 }
 
-// ===============================
-// LOADER
-// ===============================
+setInterval(crearPetalo,500);
 
-window.addEventListener("load", () => {
 
-    const loader = document.querySelector(".loader");
+// =========================================
+// GALERÍA LIGHTBOX
+// =========================================
 
-    if(loader){
+const fotos=document.querySelectorAll(".imagenes img");
 
-        setTimeout(() => {
+const fondo=document.createElement("div");
 
-            loader.style.display = "none";
+fondo.style.position="fixed";
+fondo.style.top="0";
+fondo.style.left="0";
+fondo.style.width="100%";
+fondo.style.height="100%";
+fondo.style.background="rgba(0,0,0,.9)";
+fondo.style.display="none";
+fondo.style.justifyContent="center";
+fondo.style.alignItems="center";
+fondo.style.zIndex="9999";
 
-        },1800);
+const imagenGrande=document.createElement("img");
+
+imagenGrande.style.maxWidth="90%";
+imagenGrande.style.maxHeight="90%";
+imagenGrande.style.borderRadius="20px";
+
+fondo.appendChild(imagenGrande);
+
+document.body.appendChild(fondo);
+
+fotos.forEach(img=>{
+
+    img.addEventListener("click",()=>{
+
+        imagenGrande.src=img.src;
+
+        fondo.style.display="flex";
+
+    });
+
+});
+
+fondo.addEventListener("click",()=>{
+
+    fondo.style.display="none";
+
+});
+
+
+// =========================================
+// BOTÓN VOLVER ARRIBA
+// =========================================
+
+const boton=document.createElement("button");
+
+boton.innerHTML="↑";
+
+boton.style.position="fixed";
+boton.style.right="20px";
+boton.style.bottom="20px";
+boton.style.width="55px";
+boton.style.height="55px";
+boton.style.borderRadius="50%";
+boton.style.border="none";
+boton.style.background="#d81b78";
+boton.style.color="white";
+boton.style.fontSize="24px";
+boton.style.cursor="pointer";
+boton.style.display="none";
+boton.style.zIndex="999";
+boton.style.boxShadow="0 5px 20px rgba(0,0,0,.3)";
+
+document.body.appendChild(boton);
+
+window.addEventListener("scroll",()=>{
+
+    if(window.scrollY>500){
+
+        boton.style.display="block";
+
+    }else{
+
+        boton.style.display="none";
 
     }
 
 });
 
-// ===============================
-// EFECTO EN LA FOTO
-// ===============================
+boton.addEventListener("click",()=>{
 
-const foto = document.querySelector(".imagenes img");
+    window.scrollTo({
 
-if(foto){
+        top:0,
+        behavior:"smooth"
 
-foto.addEventListener("mouseenter", ()=>{
-
-foto.style.transform="scale(1.05) rotate(2deg)";
+    });
 
 });
 
-foto.addEventListener("mouseleave", ()=>{
 
-foto.style.transform="scale(1) rotate(0deg)";
+// =========================================
+// EFECTO EN BOTONES
+// =========================================
 
-});
+document.querySelectorAll(".boton,.whatsapp").forEach(btn=>{
 
-}
+    btn.addEventListener("mouseenter",()=>{
 
-// ===============================
-// BOTÓN VOLVER ARRIBA
-// ===============================
+        btn.style.transform="scale(1.08)";
 
-const subir = document.createElement("button");
+    });
 
-subir.innerHTML = "↑";
+    btn.addEventListener("mouseleave",()=>{
 
-subir.style.position = "fixed";
-subir.style.right = "20px";
-subir.style.bottom = "20px";
-subir.style.width = "50px";
-subir.style.height = "50px";
-subir.style.border = "none";
-subir.style.borderRadius = "50%";
-subir.style.background = "#d63384";
-subir.style.color = "#fff";
-subir.style.fontSize = "24px";
-subir.style.cursor = "pointer";
-subir.style.display = "none";
-subir.style.boxShadow = "0 8px 20px rgba(0,0,0,.2)";
-subir.style.zIndex = "999";
+        btn.style.transform="scale(1)";
 
-document.body.appendChild(subir);
-
-window.addEventListener("scroll", ()=>{
-
-if(window.scrollY > 400){
-
-subir.style.display="block";
-
-}else{
-
-subir.style.display="none";
-
-}
+    });
 
 });
 
-subir.addEventListener("click", ()=>{
 
-window.scrollTo({
+// =========================================
+// MENSAJE DE BIENVENIDA
+// =========================================
 
-top:0,
+window.addEventListener("load",()=>{
 
-behavior:"smooth"
+    setTimeout(()=>{
 
-});
+        console.log("✨ Bienvenido a los XV de Gaby ✨");
+
+    },1000);
 
 });
